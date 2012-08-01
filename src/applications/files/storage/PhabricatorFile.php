@@ -253,7 +253,8 @@ final class PhabricatorFile extends PhabricatorFileDAO {
   }
 
   public static function normalizeFileName($file_name) {
-    return preg_replace('/[^a-zA-Z0-9.~_-]/', '_', $file_name);
+    ##return preg_replace('/[^a-zA-Z0-9.~_-]/', '_', $file_name);
+    return $file_name;
   }
 
   public function delete() {
