@@ -88,6 +88,7 @@ final class PhabricatorImageTransformer {
 
     $scale = min($x / $dx, $y / $dy);
     $dst = imagecreatetruecolor($dx, $dy);
+    imagecolortransparent($dst, imagecolorallocate($dst, 0, 0, 0));
 
     // If we need to chop off some pixels, chop them off from the sides instead
     // of scaling in on <0, 0>.
