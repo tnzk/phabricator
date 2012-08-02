@@ -180,8 +180,9 @@ final class PhabricatorSearchEngineMySQL extends PhabricatorSearchEngine {
         "{$t_field} field ON field.phid = document.phid");
       $where[] = qsprintf(
         $conn_r,
-        'MATCH(corpus) AGAINST (%s IN BOOLEAN MODE)',
-        $q);
+        "corpus LIKE %s",
+        '%' . $q . '%');
+
 
       // When searching for a string, promote user listings above other
       // listings.
@@ -189,9 +190,9 @@ final class PhabricatorSearchEngineMySQL extends PhabricatorSearchEngine {
         $conn_r,
         'ORDER BY
           IF(documentType = %s, 0, 1) ASC,
-          MAX(MATCH(corpus) AGAINST (%s)) DESC',
+          ' . "MAX(corpus LIKE %s) DESC",
         'USER',
-        $q);
+        '%' . $q . '%');
 
       $field = $query->getParameter('field');
       if ($field/* && $field != AdjutantQuery::FIELD_ALL*/) {
