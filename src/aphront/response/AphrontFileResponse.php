@@ -26,7 +26,7 @@ final class AphrontFileResponse extends AphrontResponse {
   private $download;
 
   public function setDownload($download) {
-    $download = preg_replace('/[^A-Za-z0-9_.-]/', '_', $download);
+    #$download = preg_replace('/[^A-Za-z0-9_.-]/', '_', $download);
     if (!strlen($download)) {
       $download = 'untitled_document.txt';
     }
