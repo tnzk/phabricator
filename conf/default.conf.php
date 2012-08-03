@@ -56,15 +56,6 @@ return array(
   'security.hmac-key' => '[D\t~Y7eNmnQGJ;rnH6aF;m2!vJ8@v8C=Cs:aQS\.Qw',
 
 
-// -- Customization --------------------------------------------------------- //
-
-  // If you want to use a custom logo (e.g., for your company or organization),
-  // copy 'webroot/rsrc/image/custom/example_template.png' to
-  // 'webroot/rsrc/image/custom/custom.png' and set this to the URI you want it
-  // to link to (like http://www.yourcompany.com/).
-  'phabricator.custom.logo'   => null,
-
-
 // -- Internationalization -------------------------------------------------- //
 
   // This allows customizing texts used in Phabricator. The class must extend
@@ -641,6 +632,14 @@ return array(
 
   // The attribute to be regarded as 'username'. Has to be unique
   'ldap.search_attribute' => '',
+
+  // Perform a search to find a user
+  // Many LDAP installations do not have the username in the dn, if this is
+  // true for you set this to true and configure the username_attribute below
+  'ldap.search-first'         => false,
+
+  // The attribute to search for if you have to search for a user
+  'ldap.username-attribute' => '',
 
   // The attribute(s) to be regarded as 'real name'.
   // If more then one attribute is supplied the values of the attributes in
@@ -1230,4 +1229,22 @@ return array(
   // only enable it when debugging.
   'debug.profile-every-request'  => false,
 
+
+// -- Previews  ------------------------------------------------------------- //
+
+  // Turn on to enable the "viewport" meta tag. This is a preview feature which
+  // will improve the usability of Phabricator on phones and tablets once it
+  // is ready.
+  'preview.viewport-meta-tag' => false,
+
+// -- Environment  ---------------------------------------------------------- //
+
+  // Phabricator occasionally shells out to other binaries on the server.
+  // An example of this is the "pygmentize" command, used to syntax-highlight
+  // code written in languages other than PHP. By default, it is assumed that
+  // these binaries are in the $PATH of the user running Phabricator (normally
+  // 'apache', 'httpd', or 'nobody'). Here you can add extra directories to
+  // the $PATH environment variable, for when these binaries are in non-standard
+  // locations.
+  'environment.append-paths' => array(),
 );

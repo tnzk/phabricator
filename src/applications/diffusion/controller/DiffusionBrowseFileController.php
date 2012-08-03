@@ -231,7 +231,10 @@ final class DiffusionBrowseFileController extends DiffusionController {
 
         $lang = last(explode('.', $drequest->getPath()));
 
-        if (isset($langs[$lang])) {
+        $prefs = $this->getRequest()->getUser()->loadPreferences();
+        $pref_symbols = $prefs->getPreference(
+          PhabricatorUserPreferences::PREFERENCE_DIFFUSION_SYMBOLS);
+        if (isset($langs[$lang]) && $pref_symbols != 'disabled') {
           Javelin::initBehavior(
             'repository-crossreference',
             array(
@@ -780,13 +783,17 @@ final class DiffusionBrowseFileController extends DiffusionController {
       $path = $old_filename;
     }
 
+    $line = null;
+    // If there's a follow error, drop the line so the user sees the message.
+    if (!$follow) {
+      $line = $this->getBeforeLineNumber($target_commit);
+    }
+
     $before_uri = $drequest->generateURI(
       array(
         'action'    => 'browse',
         'commit'    => $target_commit,
-        // If there's a follow error, drop the line so the user sees the
-        // message.
-        'line'      => $follow ? null : $drequest->getLine(),
+        'line'      => $line,
         'path'      => $path,
       ));
 
@@ -796,6 +803,41 @@ final class DiffusionBrowseFileController extends DiffusionController {
     $before_uri = $before_uri->alter('follow', $follow);
 
     return id(new AphrontRedirectResponse())->setURI($before_uri);
+  }
+
+  private function getBeforeLineNumber($target_commit) {
+    $drequest = $this->getDiffusionRequest();
+
+    $line = $drequest->getLine();
+    if (!$line) {
+      return null;
+    }
+
+    $diff_query = DiffusionRawDiffQuery::newFromDiffusionRequest($drequest);
+    $diff_query->setAgainstCommit($target_commit);
+    try {
+      $raw_diff = $diff_query->loadRawDiff();
+      $old_line = 0;
+      $new_line = 0;
+
+      foreach (explode("\n", $raw_diff) as $text) {
+        if ($text[0] == '-' || $text[0] == ' ') {
+          $old_line++;
+        }
+        if ($text[0] == '+' || $text[0] == ' ') {
+          $new_line++;
+        }
+        if ($new_line == $line) {
+          return $old_line;
+        }
+      }
+
+      // We didn't find the target line.
+      return $line;
+
+    } catch (Exception $ex) {
+      return $line;
+    }
   }
 
   private function loadParentRevisionOf($commit) {

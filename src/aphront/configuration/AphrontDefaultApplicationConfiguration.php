@@ -256,6 +256,11 @@ class AphrontDefaultApplicationConfiguration
           'diff/'                       => 'DiffusionDiffController',
           'tags/(?P<dblob>.*)'          => 'DiffusionTagListController',
           'branches/(?P<dblob>.*)'      => 'DiffusionBranchTableController',
+
+          'commit/(?P<commit>[a-z0-9]+)/branches/'
+            => 'DiffusionCommitBranchesController',
+          'commit/(?P<commit>[a-z0-9]+)/tags/'
+            => 'DiffusionCommitTagsController',
         ),
         'inline/' => array(
           'edit/(?P<phid>[^/]+)/'    => 'DiffusionInlineCommentController',
@@ -463,7 +468,8 @@ class AphrontDefaultApplicationConfiguration
 
       '/emailverify/(?P<code>[^/]+)/' =>
         'PhabricatorEmailVerificationController',
-    );
+
+    ) + $this->getApplicationRoutes();
   }
 
   protected function getResourceURIMapRules() {
@@ -475,6 +481,15 @@ class AphrontDefaultApplicationConfiguration
           => 'CelerityResourceController',
       ),
     );
+  }
+
+  private function getApplicationRoutes() {
+    $applications = PhabricatorApplication::getAllInstalledApplications();
+    $routes = array();
+    foreach ($applications as $application) {
+      $routes += $application->getRoutes();
+    }
+    return $routes;
   }
 
   public function buildRequest() {
