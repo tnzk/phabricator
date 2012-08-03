@@ -145,6 +145,7 @@ final class ManiphestTaskSummaryView extends ManiphestView {
             'a',
             array(
               'href' => '/T'.$task->getID(),
+              'target' => '_blank',
             ),
             phutil_escape_html($task->getTitle())).
         '</td>'.
